@@ -13,7 +13,7 @@ test:
 
 .PHONY: image-build
 image-build:
-	docker build -t $(IMAGE):latest -f Dockerfile .
+	podman build -t $(IMAGE):latest -f Dockerfile .
 
 .PHONY: devel
 devel: build

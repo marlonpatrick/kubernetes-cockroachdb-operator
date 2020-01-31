@@ -1,16 +1,19 @@
 package io.operator;
 
-import io.fabric8.kubernetes.api.model.KubernetesResourceList;
-import io.radanalytics.operator.common.AbstractOperator;
-import io.radanalytics.operator.common.Operator;
-import io.radanalytics.types.Example;
+import javax.inject.Singleton;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.radanalytics.operator.common.AbstractOperator;
+import io.radanalytics.operator.common.Operator;
+import io.radanalytics.types.Example;
+
+@Singleton
 @Operator(forKind = Example.class, prefix = "io.marlonpatrick")
 public class ExampleOperator extends AbstractOperator<Example> {
 
-    private static final Logger log = LoggerFactory.getLogger(AbstractOperator.class.getName());
+    private static final Logger log = LoggerFactory.getLogger(ExampleOperator.class.getName());
 
     public ExampleOperator() {
     }

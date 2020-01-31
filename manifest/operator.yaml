@@ -3,28 +3,32 @@ kind: ServiceAccount
 metadata:
   name: simple-cockroachdb-operator
 ---
-kind: Role
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
 metadata:
-  name: edit-resources
+  name: simple-cockroachdb-operator
 rules:
-- apiGroups: [""]
-  resources: ["pods", "replicationcontrollers", "services", "configmaps"]
-  verbs: ["create", "delete", "deletecollection", "get", "list", "update", "watch", "patch"]
+- apiGroups: ["apiextensions.k8s.io"]
+  resources: ["customresourcedefinitions"]
+  verbs: ["create", "get", "list", "watch"]
+- apiGroups: ["io.marlonpatrick"]
+  resources: ["examples"]
+  verbs: ["get", "list", "watch"]
 ---
-apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
 metadata:
-  name: simple-cockroachdb-operator-edit-resources
+  name: simple-cockroachdb-operator
 roleRef:
-  kind: Role
-  name: edit-resources
+  kind: ClusterRole
+  name: simple-cockroachdb-operator
   apiGroup: ""
 subjects:
   - kind: ServiceAccount
     name: simple-cockroachdb-operator
+    namespace: op
 ---
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: simple-cockroachdb-operator
@@ -44,7 +48,7 @@ spec:
       serviceAccountName: simple-cockroachdb-operator
       containers:
       - name: simple-cockroachdb-operator
-        image: io.marlonpatrick/simple-cockroachdb-operator:latest
+        image: quay.io/marlonpatrick/simple-cockroachdb-operator:latest
         #env:
         #- name: WATCHED_NAMESPACE
         #  value: myproject
@@ -52,5 +56,4 @@ spec:
         #  value: true
         #- name: COLORS
         #  value: false
-        imagePullPolicy: IfNotPresent
-
+        imagePullPolicy: Always

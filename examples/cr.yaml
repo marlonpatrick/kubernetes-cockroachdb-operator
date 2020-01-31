@@ -1,5 +1,5 @@
 apiVersion: io.marlonpatrick/v1
-kind: example
+kind: Example
 metadata:
   name: my-x
 spec:
