@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "A Kubernetes CockroachDB Cluster configuration",
+  "javaType": "io.marlonpatrick.cockroachdb.operator.CockroachDBCluster",
+  "includeAdditionalProperties": false,
+  "type": "object",
+  "extends": {
+    "type": "object",
+    "existingJavaType": "io.radanalytics.operator.common.EntityInfo"
+  },
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "namespace": {
+      "type": "string"
+    },
+    "storage": {
+      "type": "string",
+      "default": "1Gi"
+    },
+    "storageClass": {
+      "type": "string"
+    }
+  },  
+  "required": [ ]
+}

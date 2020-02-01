@@ -12,7 +12,7 @@ rules:
   resources: ["customresourcedefinitions"]
   verbs: ["create", "get", "list", "watch"]
 - apiGroups: ["io.marlonpatrick"]
-  resources: ["examples"]
+  resources: ["cockroachdbclusters"]
   verbs: ["get", "list", "watch"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -49,11 +49,13 @@ spec:
       containers:
       - name: simple-cockroachdb-operator
         image: quay.io/marlonpatrick/simple-cockroachdb-operator:latest
-        #env:
-        #- name: WATCHED_NAMESPACE
+        env:
+        #- name: WATCHED_NAMESPACE # if not specified all the namespaces will be watched; ~ denotes the same ns as the operator's
         #  value: myproject
-        #- name: CRD
-        #  value: true
         #- name: COLORS
         #  value: false
+        #- name: CRD
+        #  value: true
+        - name: FULL_RECONCILIATION_INTERVAL_S
+          value: "180"
         imagePullPolicy: Always

@@ -1,13 +1,7 @@
 apiVersion: io.marlonpatrick/v1
-kind: Example
+kind: CockroachDBCluster
 metadata:
-  name: my-x
+  name: example-cockroachdb-cluster
 spec:
-  color: blue
-  memory: 128Mi
-  cpu: 0.5
-  env:
-  - name: FOO
-    value: bar
-  - name: PATH
-    value: /bin
+  storageClass: premium-ssd5
+  storage: 1Gi
