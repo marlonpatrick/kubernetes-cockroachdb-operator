@@ -4,8 +4,6 @@ import static io.radanalytics.operator.common.AnsiColors.re;
 import static io.radanalytics.operator.common.AnsiColors.xx;
 import static io.radanalytics.operator.common.AnsiColors.ye;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Singleton;
@@ -35,7 +33,7 @@ import io.radanalytics.operator.common.Operator;
  * @author Marlon Patrick
  */
 @Singleton
-@Operator(forKind = CockroachDBCluster.class, prefix = "io.marlonpatrick")
+@Operator(forKind = CockroachDBCluster.class, prefix = "io.marlonpatrick", crd = true)
 //			additionalPrinterColumnNames = {"Workers", "Age"},
 //			additionalPrinterColumnPaths = {".spec.worker.instances", ".metadata.creationTimestamp"},
 //			additionalPrinterColumnTypes = {"string", "date"})
@@ -43,104 +41,62 @@ public class CockroachDBOperator extends AbstractOperator<CockroachDBCluster> {
 
 	private static final Logger log = LoggerFactory.getLogger(CockroachDBOperator.class.getName());
 
-	private RunningCockroachDBClusters runningClusters = new RunningCockroachDBClusters();
+	private final RunningCockroachDBClusters runningClusters = new RunningCockroachDBClusters();
 
-	private Map<String, CockroachDBClusterDeployer> deployers = new HashMap<>();
+	private CockroachDBClusterDeployer deployer;
 
 	// this.namespace
 	// onInit()
 	// fullReconciliation()
+	
+	@Override
+	protected void onInit() {
+		this.deployer = new CockroachDBClusterDeployer(this.client);
+	}
 
 	protected synchronized void onAdd(CockroachDBCluster cluster) {
-		log.info("onAdd: {}{} has been created in namespace {}: {}", prefix, entityName, namespace, cluster);
-		log.info("onAdd: namespace: {}, entityName: {}, prefix: {}, cluster: {}", namespace, entityName,
-				prefix, cluster);
-
-		try {
-			log.info("onAdd.SLEEP...: namespace: {}, entityName: {}, prefix: {}, operator: {}, cluster: {}", namespace,
-					entityName, prefix, this, cluster);
-			Thread.sleep(35 * 1000);
-			log.info("onAdd.WAKE_UP...: namespace: {}, entityName: {}, prefix: {}, operator: {}, cluster: {}",
-					namespace, entityName, prefix, this, cluster);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-			log.info("onAdd.SLEEP.ERROR: namespace: {}, entityName: {}, prefix: {}, operator: {}, cluster: {}",
-					namespace, entityName, prefix, this, cluster);
-		}
-
-//        KubernetesResourceList list = getDeployer().getResourceList(cluster);
-//        client.resourceList(list).inNamespace(namespace).createOrReplace();
-		runningClusters.put(namespace, cluster);
+		log.info("onAdd: {}{} has been created in namespace {}: {}", prefix, entityName, cluster.getNamespace(), cluster);
+        
+        deployer.deploy(cluster);
+        
+		runningClusters.put(cluster);
 	}
 
 	protected synchronized void onDelete(CockroachDBCluster cluster) {
-		log.info("Existing CockroachDBCluster has been deleted: {}", cluster);
-		log.info("onDelete: namespace: {}, entityName: {}, prefix: {}, operator: {}, cluster: {}", namespace,
-				entityName, prefix, this, cluster);
-
-		try {
-			log.info("onDelete.SLEEP...: namespace: {}, entityName: {}, prefix: {}, operator: {}, cluster: {}",
-					namespace, entityName, prefix, this, cluster);
-			Thread.sleep(35 * 1000);
-			log.info("onDelete.WAKE_UP...: namespace: {}, entityName: {}, prefix: {}, operator: {}, cluster: {}",
-					namespace, entityName, prefix, this, cluster);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-			log.info("onDelete.SLEEP.ERROR: namespace: {}, entityName: {}, prefix: {}, operator: {}, cluster: {}",
-					namespace, entityName, prefix, this, cluster);
-		}
-
-		runningClusters.remove(namespace, cluster.getName());
+		log.info("onDelete: Existing {}{} has been deleted in namespace {}: {}", prefix, entityName, cluster.getNamespace(), cluster);
+		runningClusters.remove(cluster.getNamespace(), cluster.getName());
 	}
 
 	protected synchronized void onModify(CockroachDBCluster newCluster) {
-		log.info("Existing CockroachDBCluster has been modified: {}", newCluster);
-		log.info("onModify: namespace: {}, entityName: {}, prefix: {}, operator: {}, cluster: {}", namespace,
-				entityName, prefix, this, newCluster);
+		log.info("onModify: Existing {}{} has been modified in namespace {}: {}", prefix, entityName, newCluster.getNamespace(), newCluster);
 
-		try {
-			log.info("onModify.SLEEP...: namespace: {}, entityName: {}, prefix: {}, operator: {}, cluster: {}",
-					namespace, entityName, prefix, this, newCluster);
-			Thread.sleep(35 * 1000);
-			log.info("onModify.WAKE_UP...: namespace: {}, entityName: {}, prefix: {}, operator: {}, cluster: {}",
-					namespace, entityName, prefix, this, newCluster);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-			log.info("onModify.SLEEP.ERROR: namespace: {}, entityName: {}, prefix: {}, operator: {}, cluster: {}",
-					namespace, entityName, prefix, this, newCluster);
-		}
-
-		CockroachDBCluster existingCluster = runningClusters.getCluster(namespace, newCluster.getName());
+		CockroachDBCluster existingCluster = runningClusters.getCluster(newCluster.getNamespace(), newCluster.getName());
 
 		if (existingCluster == null) {
-			log.error("Something went wrong, unable to modify existing cluster. Perhaps it wasn't deployed properly.");
+			log.error("onModify: Unable to modify existing {}{} in namespace {}. Perhaps it wasn't deployed properly.", prefix, entityName, newCluster.getNamespace());
 			return;
 		}
 
 		log.info("{}Recreating{} cluster  {}{}{}", re(), xx(), ye(), existingCluster.getName(), xx());
-
+//
 //        KubernetesResourceList list = getDeployer().getResourceList(newCluster);
 //        
 //        try {
-//            client.resourceList(list).inNamespace(namespace).createOrReplace();
+//            client.resourceList(list).inNamespace(newCluster.getNamespace()).createOrReplace();
 //        } catch (Exception e) {
 //            log.warn("{}deleting and creating{} cluster  {}{}{}", re(), xx(), ye(), existingCluster.getName(), xx());
 //            
-//            client.resourceList(list).inNamespace(namespace).delete();
-//            runningClusters.remove(namespace, existingCluster.getName());
+//            client.resourceList(list).inNamespace(newCluster.getNamespace()).delete();
+//            runningClusters.remove(newCluster.getNamespace(), existingCluster.getName());
 //            
-//            client.resourceList(list).inNamespace(namespace).createOrReplace();
-//            runningClusters.put(namespace, newCluster);
+//            client.resourceList(list).inNamespace(newCluster.getNamespace()).createOrReplace();
+//            runningClusters.put(newCluster);
 //        }
 	}
 
 	@Override
 	public synchronized void fullReconciliation() {
-		// always namespace *
-
-		log.info("Initiate fullReconciliation for CockroachDBOperator");
-		log.info("fullReconciliation: namespace: {}, entityName: {}, prefix: {}, operator: {}", namespace, entityName,
-				prefix, this);
+		log.info("Starting full reconciliation for {} in namespace {}", prefix, entityName, namespace);
 
 //        if ("*".equals(namespace)) {
 //            log.info("Skipping full reconciliation for namespace '*' (not supported)");
@@ -203,19 +159,5 @@ public class CockroachDBOperator extends AbstractOperator<CockroachDBCluster> {
 //        if (!change.get()) {
 //            log.info("no change was detected during the reconciliation");
 //        }
-	}
-
-	private CockroachDBClusterDeployer getDeployer() {
-
-//    	CockroachDBClusterDeployer deployer = deployers.get(namespace);
-//    	
-//        if (deployer == null) {
-//            deployer = new CockroachDBClusterDeployer(client, entityName, prefix, namespace);
-//            deployers.put(namespace, deployer);
-//        }
-//        
-//        return deployer;
-
-		return deployers.get(namespace);
 	}
 }

@@ -3,5 +3,4 @@ kind: CockroachDBCluster
 metadata:
   name: example-cockroachdb-cluster
 spec:
-  storageClass: premium-ssd5
   storage: 1Gi

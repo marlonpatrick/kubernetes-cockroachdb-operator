@@ -1,19 +1,45 @@
 apiVersion: v1
+kind: Namespace
+metadata:
+  name: simple-cockroachdb-operator
+---
+apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: simple-cockroachdb-operator
+  namespace: simple-cockroachdb-operator
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: simple-cockroachdb-operator
 rules:
+# -------------------------------------------------------------------------
+# The custom resource definition (CRD) is created by the operator.
+# It needs to create, list, watch, get CRDs.
+# -------------------------------------------------------------------------
 - apiGroups: ["apiextensions.k8s.io"]
   resources: ["customresourcedefinitions"]
-  verbs: ["create", "get", "list", "watch"]
+  verbs: ["get", "list", "watch", "create"]
+# -------------------------------------------------------------------------
+# For the custom resource, the operator needs list, watch, get.
+# -------------------------------------------------------------------------
 - apiGroups: ["io.marlonpatrick"]
   resources: ["cockroachdbclusters"]
   verbs: ["get", "list", "watch"]
+# -------------------------------------------------------------------------
+# The following are the resources created by the operator,
+# the operator needs to list, watch, get, and create these resources.
+# -------------------------------------------------------------------------
+- apiGroups: [""]
+  resources: ["services"]
+  verbs: ["get", "list", "watch", "create"]
+- apiGroups: ["policy"]
+  resources: ["poddisruptionbudgets"]
+  verbs: ["get", "list", "watch", "create"]
+- apiGroups: ["apps"]
+  resources: ["statefulsets"]
+  verbs: ["get", "list", "watch", "create"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -26,12 +52,13 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: simple-cockroachdb-operator
-    namespace: op
+    namespace: simple-cockroachdb-operator
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: simple-cockroachdb-operator
+  namespace: simple-cockroachdb-operator
   labels: &default-labels
     app.kubernetes.io/name: simple-cockroachdb-operator
     app.kubernetes.io/version: v0.0.1-v1alpha1
@@ -54,8 +81,6 @@ spec:
         #  value: myproject
         #- name: COLORS
         #  value: false
-        #- name: CRD
-        #  value: true
         - name: FULL_RECONCILIATION_INTERVAL_S
           value: "180"
         imagePullPolicy: Always
