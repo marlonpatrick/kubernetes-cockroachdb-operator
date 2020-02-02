@@ -1,9 +1,9 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: cluster-init
+  name: ${cockroachdbcluster.name}-cluster-init
   labels:
-    app: cockroachdb
+    app: ${cockroachdbcluster.name}
 spec:
   template:
     spec:
@@ -15,5 +15,5 @@ spec:
           - "/cockroach/cockroach"
           - "init"
           - "--insecure"
-          - "--host=cockroachdb-0.cockroachdb"
+          - "--host=${cockroachdbcluster.name}-0.${cockroachdbcluster.name}"
       restartPolicy: OnFailure
