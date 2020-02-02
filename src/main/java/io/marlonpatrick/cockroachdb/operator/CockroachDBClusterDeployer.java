@@ -28,14 +28,13 @@ class CockroachDBClusterDeployer {
     	
     	Map<String, String> parameters = new HashMap<>();
     	parameters.put("cockroachdbcluster.name", cluster.getName());
+    	parameters.put("cockroachdbcluster.uid", cluster.getUid());
     	parameters.put("cockroachdbcluster.storage", cluster.getStorage());
 
 		List<HasMetadata> resourceList = Serialization.unmarshal(CockroachDBClusterDeployer.class.getResourceAsStream("/cockroachdb-deploy/cockroachdb-statefulset.yaml"), parameters);
 
 		log.info("deploy: cluster: {}, parameters: {}, resourceList: {}", cluster, parameters, resourceList);
 
-		long startTime = System.currentTimeMillis();
         client.resourceList(resourceList).inNamespace(cluster.getNamespace()).createOrReplace();
-        log.info("deploy: elapsed time in ms: {}", System.currentTimeMillis() - startTime);
     }
 }

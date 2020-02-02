@@ -6,6 +6,11 @@ metadata:
   name: ${cockroachdbcluster.name}-public
   labels:
     app: ${cockroachdbcluster.name}
+  ownerReferences:
+    - apiVersion: io.marlonpatrick/v1
+      kind: CockroachDBCluster
+      name: ${cockroachdbcluster.name}
+      uid: ${cockroachdbcluster.uid}
 spec:
   ports:
   # The main port, served by gRPC, serves Postgres-flavor SQL, internode
@@ -40,6 +45,11 @@ metadata:
     prometheus.io/scrape: "true"
     prometheus.io/path: "_status/vars"
     prometheus.io/port: "8080"
+  ownerReferences:
+    - apiVersion: io.marlonpatrick/v1
+      kind: CockroachDBCluster
+      name: ${cockroachdbcluster.name}
+      uid: ${cockroachdbcluster.uid}
 spec:
   ports:
   - port: 26257
@@ -62,6 +72,11 @@ metadata:
   name: ${cockroachdbcluster.name}-budget
   labels:
     app: ${cockroachdbcluster.name}
+  ownerReferences:
+    - apiVersion: io.marlonpatrick/v1
+      kind: CockroachDBCluster
+      name: ${cockroachdbcluster.name}
+      uid: ${cockroachdbcluster.uid}
 spec:
   selector:
     matchLabels:
@@ -72,6 +87,11 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: ${cockroachdbcluster.name}
+  ownerReferences:
+    - apiVersion: io.marlonpatrick/v1
+      kind: CockroachDBCluster
+      name: ${cockroachdbcluster.name}
+      uid: ${cockroachdbcluster.uid}
 spec:
   serviceName: "${cockroachdbcluster.name}"
   replicas: 1

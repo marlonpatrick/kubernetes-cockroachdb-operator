@@ -12,7 +12,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.radanalytics.operator.common.AbstractOperator;
+import io.radanalytics.operator.common.CustomResourceWatcher;
 import io.radanalytics.operator.common.Operator;
+import io.radanalytics.operator.common.crd.InfoClass;
 
 /**
  * <pre>
@@ -44,15 +46,17 @@ public class CockroachDBOperator extends AbstractOperator<CockroachDBCluster> {
 	private final RunningCockroachDBClusters runningClusters = new RunningCockroachDBClusters();
 
 	private CockroachDBClusterDeployer deployer;
-
-	// this.namespace
-	// onInit()
-	// fullReconciliation()
 	
 	@Override
 	protected void onInit() {
 		this.deployer = new CockroachDBClusterDeployer(this.client);
 	}
+
+    protected CockroachDBCluster convertCr(InfoClass info) {
+    	CockroachDBCluster cluster = CustomResourceWatcher.defaultConvert(CockroachDBCluster.class, info);
+    	cluster.setUid(info.getMetadata().getUid());
+    	return cluster;
+    }
 
 	protected synchronized void onAdd(CockroachDBCluster cluster) {
 		log.info("onAdd: {}{} has been created in namespace {}: {}", prefix, entityName, cluster.getNamespace(), cluster);
