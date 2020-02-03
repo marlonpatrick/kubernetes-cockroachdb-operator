@@ -1,6 +1,6 @@
 # simple-cockroachdb-operator
 
-# Very Quick Start
+# Quick Start
 
 Run the `simple-cockroachdb-operator` deployment:
 
@@ -13,15 +13,17 @@ kubectl -n simple-cockroachdb-operator get all
 Create a `CockroachDBCluster` resource from the prepared example:
 
 ```bash
-kubectl -n my-namespace apply --wait=true -f https://raw.githubusercontent.com/marlonpatrick/kubernetes-cockroachdb-operator/master/operator-deploy/example-cockroachdb.yaml
+kubectl create namespace test-cockroachdb-operator
 
-kubectl -n my-namespace get all
+kubectl -n test-cockroachdb-operator apply --wait=true -f https://raw.githubusercontent.com/marlonpatrick/kubernetes-cockroachdb-operator/master/operator-deploy/example-cockroachdb.yaml
+
+kubectl -n test-cockroachdb-operator get all
 ```
 
 Test the cluster deploy
 
 ```bash
-kubectl -n my-namespace run cockroachdb -it \
+kubectl -n test-cockroachdb-operator run cockroachdb -it \
 --image=cockroachdb/cockroach:v19.2.2 \
 --rm \
 --restart=Never \
