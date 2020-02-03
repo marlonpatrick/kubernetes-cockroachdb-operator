@@ -36,10 +36,7 @@ import io.radanalytics.operator.common.crd.InfoClass;
  * </pre>
  */
 @Singleton
-@Operator(forKind = CockroachDBCluster.class, prefix = "io.marlonpatrick", crd = true,
-			additionalPrinterColumnNames = {"Storage"},
-			additionalPrinterColumnPaths = {".spec.storage"},
-			additionalPrinterColumnTypes = {"string"})
+@Operator(forKind = CockroachDBCluster.class, prefix = "io.marlonpatrick", crd = true)
 public class CockroachDBOperator extends AbstractOperator<CockroachDBCluster> {
 
 	private static final Logger log = LoggerFactory.getLogger(CockroachDBOperator.class.getName());
