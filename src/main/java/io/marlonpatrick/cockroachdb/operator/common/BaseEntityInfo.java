@@ -14,4 +14,8 @@ public class BaseEntityInfo extends EntityInfo {
 		this.uid = uid;
 	}
 
+	@Override
+	public String toString() {
+		return "BaseEntityInfo [uid=" + uid + ", name=" + name + ", namespace=" + namespace + "]";
+	}
 }

@@ -1,4 +1,6 @@
-IMAGE?=io.marlonpatrick/simple-cockroachdb-operator
+IMAGE?=quay.io/marlonpatrick/simple-cockroachdb-operator
+NS1?=cluster01
+NS2?=cluster02
 
 .PHONY: build
 build: package image-build
@@ -7,27 +9,28 @@ build: package image-build
 package:
 	MAVEN_OPTS="-Djansi.passthrough=true -Dplexus.logger.type=ansi $(MAVEN_OPTS)" sh ./mvnw clean package -DskipTests
 
-.PHONY: test
-test:
-	MAVEN_OPTS="-Djansi.passthrough=true -Dplexus.logger.type=ansi $(MAVEN_OPTS)" sh ./mvnw clean test
-
 .PHONY: image-build
 image-build:
 	podman build -t $(IMAGE):latest -f Dockerfile .
 
-.PHONY: devel
-devel: build
-	-docker kill `docker ps -q` || true
-	oc cluster up
-	oc create -f manifest/operator.yaml
-	until [ "true" = "`oc get pod -l app.kubernetes.io/name=simple-cockroachdb-operator -o json 2> /dev/null | grep \"\\\"ready\\\": \" | sed -e 's;.*\(true\|false\),;\1;'`" ]; do printf "."; sleep 1; done
-	oc logs -f `oc get pods --no-headers -l app.kubernetes.io/name=simple-cockroachdb-operator | cut -f1 -d' '`
+.PHONY: push-image
+push-image:
+	podman push $(IMAGE):latest
+	
+.PHONY: deploy-dev
+deploy-dev:
+	kubectl config use-context minikube
+	kubectl delete namespace $(NS1)
+	kubectl create namespace $(NS1)
+	kubectl delete namespace $(NS2)
+	kubectl create namespace $(NS2)
+	kubectl delete -f operator-deploy/operator.yaml
+	kubectl delete crd/cockroachdbclusters.io.marlonpatrick
+	kubectl apply -f operator-deploy/operator.yaml --wait=true
+	sleep 10
+	kubectl apply -f operator-deploy/example-cockroachdb.yaml -n $(NS1)
+	kubectl apply -f operator-deploy/example-cockroachdb.yaml -n $(NS2)
 
-.PHONY: devel-kubernetes
-devel-kubernetes:
-	-minikube delete
-	minikube start --vm-driver kvm2
-	eval `minikube docker-env` && $(MAKE) build
-	kubectl create -f manifest/operator.yaml
-	until [ "true" = "`kubectl get pod -l app.kubernetes.io/name=simple-cockroachdb-operator -o json 2> /dev/null | grep \"\\\"ready\\\": \" | sed -e 's;.*\(true\|false\),;\1;'`" ]; do printf "."; sleep 1; done
-	kubectl logs -f `kubectl get pods --no-headers -l app.kubernetes.io/name=simple-cockroachdb-operator | cut -f1 -d' '`
+.PHONY: test
+test:
+	MAVEN_OPTS="-Djansi.passthrough=true -Dplexus.logger.type=ansi $(MAVEN_OPTS)" sh ./mvnw clean test

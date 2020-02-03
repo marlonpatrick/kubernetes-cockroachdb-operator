@@ -1,51 +1,44 @@
 # simple-cockroachdb-operator
 
-[![Build status](https://travis-ci.org/radanalyticsio/spark-operator.svg?branch=master)](https://travis-ci.org/radanalyticsio/spark-operator)
-[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
-
-`{ConfigMap|CRD}`-based approach for managing the X in Kubernetes and OpenShift.
-
-This operator uses [abstract-operator](https://github.com/jvm-operators/abstract-operator) library.
-
-# Build
-
-```bash
-make build
-```
-
-# Quick Start
+# Very Quick Start
 
 Run the `simple-cockroachdb-operator` deployment:
-```bash
-kubectl create -f manifest/operator.yaml
-```
-
-Create new ConfigMap from the prepared example:
 
 ```bash
-kubectl create -f examples/cm.yaml
+kubectl apply -f operator-deploy/operator.yaml --wait=true
 ```
 
-
-For deployment on OpenShift use the same commands as above, but with `oc` instead of `kubectl`.
-
-
-This operator can also work with CRDs. Assuming the admin user is logged in, you can install the operator with:
+Create a `CockroachDBCluster` resource from the prepared example:
 
 ```bash
-kubectl create -f manifest/operator-crd.yaml
+kubectl apply -f operator-deploy/example-cockroachdb.yaml -n my-namespace
+
+watch kubectl -n my-namespace get all
 ```
 
-and then create the Spark clusters by creating the custom resources (CR).
+Test the cluster deploy
 
 ```bash
-kubectl create sparkcluster -f examples/cr.yaml
+kubectl -n my-namespace run cockroachdb -it \
+--image=cockroachdb/cockroach:v19.2.2 \
+--rm \
+--restart=Never \
+-- sql \
+--insecure \
+--host=example-cockroachdb-cluster-public
 ```
 
-# Development
+```sql
+CREATE DATABASE bank;
 
-```bash
-make devel
+CREATE TABLE bank.accounts (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      balance DECIMAL
+  );
+
+INSERT INTO bank.accounts (balance)
+  VALUES
+      (1000.50), (20000), (380), (500), (55000);
+
+SELECT * FROM bank.accounts;
 ```
-
-This will build the image and deploys the operator into OpenShift. It assumes the `oc` on `PATH`.

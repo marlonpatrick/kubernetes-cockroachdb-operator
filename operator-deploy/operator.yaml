@@ -29,17 +29,20 @@ rules:
   verbs: ["get", "list", "watch"]
 # -------------------------------------------------------------------------
 # The following are the resources created by the operator,
-# the operator needs to list, watch, get, and create these resources.
+# the operator needs to list, watch, get,create, update and delete these resources.
 # -------------------------------------------------------------------------
 - apiGroups: [""]
   resources: ["services"]
-  verbs: ["get", "list", "watch", "create"]
+  verbs: ["get", "list", "watch", "create", "update", "delete"]
 - apiGroups: ["policy"]
   resources: ["poddisruptionbudgets"]
-  verbs: ["get", "list", "watch", "create"]
+  verbs: ["get", "list", "watch", "create", "update", "delete"]
 - apiGroups: ["apps"]
   resources: ["statefulsets"]
-  verbs: ["get", "list", "watch", "create"]
+  verbs: ["get", "list", "watch", "create", "update", "delete"]
+- apiGroups: ["batch", "extensions"]
+  resources: ["jobs"]
+  verbs: ["get", "list", "watch", "create", "update", "delete"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
