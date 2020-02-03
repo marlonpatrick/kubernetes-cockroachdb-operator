@@ -17,10 +17,10 @@ kubectl create namespace test-cockroachdb-operator
 
 kubectl -n test-cockroachdb-operator apply --wait=true -f https://raw.githubusercontent.com/marlonpatrick/kubernetes-cockroachdb-operator/master/operator-deploy/example-cockroachdb.yaml
 
-kubectl -n test-cockroachdb-operator get all
+watch kubectl -n test-cockroachdb-operator get all
 ```
 
-Test the cluster deploy
+After pod example-cockroachdb-cluster-0 is Ready, test the cluster deploy:
 
 ```bash
 kubectl -n test-cockroachdb-operator run cockroachdb -it \
