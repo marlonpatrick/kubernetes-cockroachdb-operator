@@ -1,0 +1,15 @@
+apiVersion: io.marlonpatrick/v1
+kind: CockroachDBCluster
+metadata:
+  name: example-cockroachdb-cluster
+spec:
+  storage: 1Gi
+  backup:
+    databases: "*"
+    cronSchedule: 0/2 * * * *
+    maxKeptBackups: 3
+    storage:
+      s3:
+        awsSettingsSecret: aws-settings
+        bucket: mpbs-cockroachdb-operator-test
+        rootPath: example-cluster-prod-backup

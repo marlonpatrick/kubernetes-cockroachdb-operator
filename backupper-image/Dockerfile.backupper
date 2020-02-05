@@ -1,0 +1,21 @@
+FROM cockroachdb/cockroach:v19.2.2
+
+ENTRYPOINT []
+
+RUN useradd -u 1001 -r -g 0 -d /cockroach -s /sbin/nologin \
+      -c "Default Cotainer User" cockroachdb-backupper && \
+      chown -R 1001:0 /cockroach
+
+RUN apt-get update && \
+	apt-get install -y python3 curl groff less && \
+	rm -rf /var/lib/apt/lists/*
+
+RUN curl -O https://bootstrap.pypa.io/get-pip.py && \
+	python3 get-pip.py && pip3 install awscli --upgrade && \
+	rm -f get-pip.py
+
+COPY cockroachdb-backup.sh /cockroach/
+
+RUN chmod +x /cockroach/cockroachdb-backup.sh
+
+USER 1001

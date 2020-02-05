@@ -1,0 +1,43 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: ${cockroachdbcluster.name}-backupper
+  labels:
+    app: ${cockroachdbcluster.name}
+  ownerReferences:
+    - apiVersion: io.marlonpatrick/v1
+      kind: CockroachDBCluster
+      name: ${cockroachdbcluster.name}
+      uid: ${cockroachdbcluster.uid}
+spec:
+  schedule: '${cockroachdbcluster.backup.cronSchedule}'
+  jobTemplate:
+    metadata:
+      name: ${cockroachdbcluster.name}-backupper
+    spec:
+      template:
+        spec:
+          containers:
+          - name: cockroachdb-backupper
+            image: quay.io/marlonpatrick/simple-cockroachdb-backupper:latest
+            env:
+            - name: COCKROACHDB_BACKUP_CLUSTER_NAME
+              value: ${cockroachdbcluster.name}
+            - name: COCKROACHDB_BACKUP_MAX_KEPT_BACKUPS
+              value: ${cockroachdbcluster.backup.maxKeptBackups}
+            - name: COCKROACHDB_BACKUP_AWS_S3_BUCKET
+              value: ${cockroachdbcluster.backup.storage.s3.bucket}
+            - name: COCKROACHDB_BACKUP_AWS_S3_ROOT_PATH
+              value: ${cockroachdbcluster.backup.storage.s3.rootPath}
+            - name: COCKROACHDB_BACKUP_DATABASES
+              value: "${cockroachdbcluster.backup.databases}"
+            volumeMounts:
+            - name: aws-settings
+              mountPath: /cockroach/.aws
+            command: ["/cockroach/cockroachdb-backup.sh"]
+          restartPolicy: OnFailure
+          volumes:
+          - name: aws-settings
+            secret:
+              secretName: ${cockroachdbcluster.backup.storage.s3.awsSettingsSecret}
+status: {}
