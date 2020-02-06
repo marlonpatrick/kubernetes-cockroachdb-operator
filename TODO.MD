@@ -20,6 +20,8 @@
 
 - Parametrizar ownerReferences.apiVersion
 
+- Parametrizar --as-of="$cockroachdb_current_time" no comando de dump, inclusive de não usar essa opção.
+
 - schema.json: 
 	- O campo storage ao invés de ser string pode ser um objeto Quantity do Kubernetes.
 	- O campo databases poderia ser um array
