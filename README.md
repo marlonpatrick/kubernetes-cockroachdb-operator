@@ -44,12 +44,14 @@ region = <region>
 kubectl -n test-cockroachdb-operator create secret generic aws-settings --from-file=$AWS_DIR/credentials --from-file=$AWS_DIR/config
 ```
 
+
 Create the cluster:
 
 ```bash
 # Download example file
 wget https://raw.githubusercontent.com/marlonpatrick/kubernetes-cockroachdb-operator/master/operator-deploy/example-cockroachdb-with-backup.yaml
 
+# REPLACE THIS PARAMETERS
 # MY_BUCKET: your AWS S3 bucket where backup files will be placed.
 # MY_BUCKET_ROOT_PATH: the root directory from your AWS S3 Bucket where backup files will be placed. 
 # Final backup path: BUCKET/ROOT_PATH/database-name/backup-file.sql.gz
@@ -89,4 +91,4 @@ INSERT INTO bank.accounts (balance)
 SELECT * FROM bank.accounts;
 ```
 
-5 - After 3 minutes, check your AWS S3 Bucket 
+5 - If you deploy with backup activated, after 3 minutes, check your AWS S3 Bucket 

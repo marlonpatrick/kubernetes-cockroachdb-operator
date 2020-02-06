@@ -25,15 +25,15 @@ deploy-dev: destroy-dev create-dev
 destroy-dev:
 	kubectl config use-context minikube
 	kubectl delete namespace $(NS1)
-	kubectl create namespace $(NS1)
 	kubectl delete namespace $(NS2)
-	kubectl create namespace $(NS2)
 	kubectl delete -f operator-deploy/operator.yaml
 	kubectl delete crd/cockroachdbclusters.io.marlonpatrick
 
 .PHONY: create-dev
 create-dev:
 	kubectl apply -f operator-deploy/operator.yaml --wait=true
+	kubectl create namespace $(NS2)
+	kubectl create namespace $(NS1)
 	kubectl -n $(NS2) create secret generic aws-settings --from-file=backupper-image/aws-dev-settings/credentials --from-file=backupper-image/aws-dev-settings/config
 	sleep 10
 	kubectl apply -f operator-deploy/example-cockroachdb.yaml -n $(NS1)
