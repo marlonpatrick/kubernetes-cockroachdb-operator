@@ -105,7 +105,7 @@ public class CockroachDBClusterController extends AbstractOperator<CockroachDBCl
 	}
 
 	/**
-	 * Dummy onModify: always undeploy and redeploy
+	 * Dummy onModify: data loss, always delete and recreate objects
 	 */
 	protected synchronized void onModify(CockroachDBCluster newCluster) {
 		CockroachDBCluster existingCluster = runningClusters.get(newCluster.getUid());
