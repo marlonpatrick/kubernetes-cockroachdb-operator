@@ -37,7 +37,7 @@ create-dev:
 	kubectl -n $(NS2) create secret generic aws-settings --from-file=backupper-image/aws-dev-settings/credentials --from-file=backupper-image/aws-dev-settings/config
 	sleep 10
 	kubectl apply -f operator-deploy/example-cockroachdb.yaml -n $(NS1)
-	sed -e 's|${MY_BUCKET}|mpbs-cockroachdb-operator-test|g' -e 's|${MY_BUCKET_ROOT_PATH}|example-cluster-prod-backup|g' operator-deploy/example-cockroachdb-with-backup.yaml | kubectl -n $(NS2) apply -f -
+	sed -e 's|$${MY_BUCKET}|mpbs-cockroachdb-operator-test|g' -e 's|$${MY_BUCKET_ROOT_PATH}|example-cluster-prod-backup|g' operator-deploy/example-cockroachdb-with-backup.yaml | kubectl -n $(NS2) apply -f -
     	    
 .PHONY: backupper-image-build
 backupper-image-build:
