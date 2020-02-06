@@ -11,5 +11,5 @@ spec:
     storage:
       s3:
         awsSettingsSecret: aws-settings
-        bucket: mpbs-cockroachdb-operator-test
-        rootPath: example-cluster-prod-backup
+        bucket: ${MY_BUCKET}
+        rootPath: ${MY_BUCKET_ROOT_PATH}

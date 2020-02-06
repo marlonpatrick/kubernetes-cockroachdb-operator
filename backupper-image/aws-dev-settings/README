@@ -1,0 +1,3 @@
+The purpose of this folder is to place AWS CLI configuration files (credentials and config) to facilitate testing in the development environment.
+
+As these files contain sensitive data, this folder is being ignored by git (.gitignore) with the exception of this README file.

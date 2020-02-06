@@ -17,9 +17,12 @@ image-build:
 .PHONY: push-image
 push-image:
 	podman push $(OPERATOR_IMAGE):latest
-	
+
 .PHONY: deploy-dev
-deploy-dev:
+deploy-dev: destroy-dev create-dev
+
+.PHONY: destroy-dev
+destroy-dev:
 	kubectl config use-context minikube
 	kubectl delete namespace $(NS1)
 	kubectl create namespace $(NS1)
@@ -27,12 +30,15 @@ deploy-dev:
 	kubectl create namespace $(NS2)
 	kubectl delete -f operator-deploy/operator.yaml
 	kubectl delete crd/cockroachdbclusters.io.marlonpatrick
+
+.PHONY: create-dev
+create-dev:
 	kubectl apply -f operator-deploy/operator.yaml --wait=true
-	kubectl -n $(NS2) create secret generic aws-settings --from-file=backupper-image/aws-dev-settings/credentials --from-file=backupper-image/aws-dev-settings/config		
+	kubectl -n $(NS2) create secret generic aws-settings --from-file=backupper-image/aws-dev-settings/credentials --from-file=backupper-image/aws-dev-settings/config
 	sleep 10
 	kubectl apply -f operator-deploy/example-cockroachdb.yaml -n $(NS1)
-	kubectl apply -f operator-deploy/example-cockroachdb-backup.yaml -n $(NS2)
-
+	sed -e 's|${MY_BUCKET}|mpbs-cockroachdb-operator-test|g' -e 's|${MY_BUCKET_ROOT_PATH}|example-cluster-prod-backup|g' operator-deploy/example-cockroachdb-with-backup.yaml | kubectl -n $(NS2) apply -f -
+    	    
 .PHONY: backupper-image-build
 backupper-image-build:
 	podman build -t $(BACKUPPER_IMAGE):latest -f backupper-image/Dockerfile.backupper backupper-image/
