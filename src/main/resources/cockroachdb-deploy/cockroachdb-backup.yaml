@@ -14,8 +14,13 @@ spec:
   jobTemplate:
     metadata:
       name: ${cockroachdbcluster.name}-backupper
+      labels:
+        app: ${cockroachdbcluster.name}
     spec:
       template:
+        metadata:
+          labels:
+            app: ${cockroachdbcluster.name}
         spec:
           containers:
           - name: cockroachdb-backupper

@@ -11,6 +11,9 @@ metadata:
       uid: ${cockroachdbcluster.uid}
 spec:
   template:
+    metadata:
+      labels:
+        app: ${cockroachdbcluster.name}
     spec:
       containers:
       - name: cluster-init

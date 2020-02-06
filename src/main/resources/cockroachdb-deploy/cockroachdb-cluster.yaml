@@ -87,6 +87,8 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: ${cockroachdbcluster.name}
+  labels:
+    app: ${cockroachdbcluster.name}
   ownerReferences:
     - apiVersion: io.marlonpatrick/v1
       kind: CockroachDBCluster
