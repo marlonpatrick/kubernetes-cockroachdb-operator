@@ -17,7 +17,7 @@
       "type": "object",
       "properties": {
         "databases": {
-          "type": "string"
+          "type": "string"          
         },
         "cronSchedule": {
           "type": "string",
@@ -25,7 +25,8 @@
         },
         "maxKeptBackups": {
           "type": "integer",
-          "default": "3"
+          "default": "3",
+          "minimum": "1"
         },
         "storage": {
           "type": "object",
@@ -48,6 +49,5 @@
         }
       }
     }
-  },
-  "required": []
+  }
 }
