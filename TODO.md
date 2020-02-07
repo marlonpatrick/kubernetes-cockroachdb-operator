@@ -2,9 +2,13 @@
 
 - Possibilitar configurações diversas via CustomResource. Exemplos: container image, replicas, resource limits, storage class (kubernetes e S3), entre outros.
 
+- onModify: implementar de forma mais inteligente onde cada campo alterado possa ter ações específicas ao invés de simplesmente deletar e recriar o cluster.
+
+- Monitorar e reagir a eventos relacionados a secondary resources.
+
 - Possibilitar deploy de um cluster no modo secure.
 
-- onAdd, onModify: comparar a versão do customresource para identificar se o evento se refere a uma versão mais antiga ou mais nova. Caso seja mais antiga, ignorar.
+- onAdd, onModify: verificar versão do customresource para identificar se o evento se refere a uma versão mais antiga ou mais nova.
 
 - onAdd / onModify: ao detectar que não será possível fazer o deploy ou modificação no cluster, algumas opções podem ser consideradas:
 	- Apenas logar a situação
