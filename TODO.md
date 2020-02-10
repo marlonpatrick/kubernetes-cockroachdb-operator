@@ -30,5 +30,6 @@
 	- O campo storage ao invés de ser string pode ser um objeto Quantity do Kubernetes.
 	- O campo databases poderia ser um array
 	- Adicionar uma descrição nos campos com exemplos de formatação válida
+	- Especificar campos obrigatórios
 
 - Configurar operator para monitoramento via Prometheus.
