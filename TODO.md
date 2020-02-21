@@ -1,5 +1,4 @@
 
-
 - Possibilitar configurações diversas via CustomResource. Exemplos: container image, replicas, resource limits, storage class (kubernetes e S3), entre outros.
 
 - onModify: implementar de forma mais inteligente onde cada campo alterado possa ter ações específicas ao invés de simplesmente deletar e recriar o cluster.
@@ -33,3 +32,5 @@
 	- Especificar campos obrigatórios
 
 - Configurar operator para monitoramento via Prometheus.
+
+- Implementar testes unitários para o operator.
